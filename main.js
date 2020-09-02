@@ -4,7 +4,7 @@ const {app, BrowserWindow} = require('electron');
 //     console.log(`Checking if app is ready: ${ app.isReady() }`);
 // }, 1000);
 
-let mainWindow, secondaryWindow;
+let mainWindow, secondaryWindow, thirdWindow;
 
 const createMainWindow = () => {
     mainWindow = new BrowserWindow({
@@ -23,7 +23,7 @@ const createMainWindow = () => {
 
     secondaryWindow = new BrowserWindow({
         width: 500,
-        height: 200,
+        height: 400,
         // SHOWING WINDOW GRACEFULLY: SECOND METHOD (SETTING THE BG COLOR OF THE WINDOW)
         backgroundColor: 'white',
         // show: false
@@ -36,9 +36,26 @@ const createMainWindow = () => {
         show: false
     })
 
+    thirdWindow = new BrowserWindow({
+        width: 500,
+        height: 400,
+        // SHOWING WINDOW GRACEFULLY: SECOND METHOD (SETTING THE BG COLOR OF THE WINDOW)
+        backgroundColor: 'white',
+        // show: false
+        webPreferences: {
+            nodeIntegration: true,
+        },
+        //frame: false,
+        minWidth: 200,
+        minHeight: 200,
+        // modal: true,
+        // parent: mainWindow
+    })
+
     //  LOAD FILE IN THE MAIN WINDOW: 
     mainWindow.loadFile('./index.html');
     secondaryWindow.loadFile('./secondary.html');
+    thirdWindow.loadFile('./index.html');
 
     //  SHOWING WINDOW GRACEFULLY:  FIRST METHOD
     // mainWindow.once('ready-to-show', mainWindow.show);
@@ -58,6 +75,31 @@ const createMainWindow = () => {
     mainWindow.on('closed', () => {
         mainWindow = null;
     })
+
+    thirdWindow.on('closed', () => {
+        thirdWindow = null;
+    })
+
+    // thirdWindow.on('focus', () => {
+    //     console.log('Third window Focused!');
+    // })
+
+    // mainWindow.on('focus', () => {
+    //     console.log('Main window Focused!');
+    // })
+
+    // thirdWindow.on('blur', () => console.log('Third Window Unfocused!'))
+    // mainWindow.on('blur', () => console.log('Main Window Unfocused!'))
+
+    //   RETURNS ALL THE BrowserWindow INSTANCES: 
+
+    // console.log(BrowserWindow.getAllWindows());
+
+
+    //  WINDOW ID'S: 
+    // console.log(mainWindow.id);  // 1
+    // console.log(secondaryWindow.id);  // 2
+    // console.log(thirdWindow.id); // 3
   
 }
 
@@ -73,6 +115,8 @@ app.on('ready', () => {
 
     createMainWindow();
 })
+
+
 
 //  WHEN THE APP IS FOCUSED, THE USER IS IN THE APP:
 // app.on('browser-window-focus', () => {
