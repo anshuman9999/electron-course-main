@@ -1,4 +1,5 @@
 const {app, BrowserWindow} = require('electron');
+const windowStateKeeper = require('electron-window-state');
 
 // setTimeout(() => {
 //     console.log(`Checking if app is ready: ${ app.isReady() }`);
@@ -7,9 +8,18 @@ const {app, BrowserWindow} = require('electron');
 let mainWindow, secondaryWindow, thirdWindow;
 
 const createMainWindow = () => {
+
+    // WINDOW STATE MANAGER:  
+    let winState = windowStateKeeper({
+        defaultHeight: 600,
+        defaultWidth: 800
+    })
+
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: winState.width,
+        height: winState.height,
+        x: winState.x,
+        y: winState.y,
         // SHOWING WINDOW GRACEFULLY: SECOND METHOD (SETTING THE BG COLOR OF THE WINDOW)
         backgroundColor: 'white',
         // show: false
@@ -41,7 +51,7 @@ const createMainWindow = () => {
         height: 400,
         // SHOWING WINDOW GRACEFULLY: SECOND METHOD (SETTING THE BG COLOR OF THE WINDOW)
         backgroundColor: 'white',
-        // show: false
+        show: false,
         webPreferences: {
             nodeIntegration: true,
         },
@@ -53,9 +63,11 @@ const createMainWindow = () => {
     })
 
     //  LOAD FILE IN THE MAIN WINDOW: 
-    mainWindow.loadFile('./index.html');
+    //mainWindow.loadFile('./index.html');
     secondaryWindow.loadFile('./secondary.html');
     thirdWindow.loadFile('./index.html');
+
+    mainWindow.loadURL('https://httpbin.org/basic-auth/user/passwd');
 
     //  SHOWING WINDOW GRACEFULLY:  FIRST METHOD
     // mainWindow.once('ready-to-show', mainWindow.show);
@@ -77,7 +89,7 @@ const createMainWindow = () => {
     })
 
     thirdWindow.on('closed', () => {
-        thirdWindow = null;
+        mainWindow.minimize();
     })
 
     // thirdWindow.on('focus', () => {
@@ -100,7 +112,50 @@ const createMainWindow = () => {
     // console.log(mainWindow.id);  // 1
     // console.log(secondaryWindow.id);  // 2
     // console.log(thirdWindow.id); // 3
-  
+
+    winState.manage(mainWindow);
+
+    let wc = mainWindow.webContents;
+    // console.log(wc);
+
+    // wc.on('did-finish-load', () => {
+    //     console.log('Content fully loaded!');
+    // })
+
+    // wc.on('dom-ready', () => {
+    //     console.log('DOM Ready!');
+    // })
+
+    // wc.on('new-window', (event, url) => {
+    //     event.preventDefault();
+    //     console.log(`Creating a new window for: ${ url }`);
+    // })
+
+    wc.on('before-input-event', (event, input) => {
+        console.log(`${ input.key }: ${ input.type }`);
+    })
+
+// ###################################################
+
+    //  CHECKING FOR BASIC AUTH: FIRST THE LOGIN EVENT IS FIRED AT THE TIME OF AUTH
+    //  AFTER THAT DID NAVIITE GETS EMITTED WHEN THE LOGIN IS SUCCESSFULL WITH CODE 200\
+    //  REMOVE LOGIN ANMD EMIT DID NAVIGATE WITHOUT IT, IT WILL GIVE STATUS CODE AS 401 (UNAUTH)
+    //  BECAUSE LOGIN WAS NOT FIRED ANS BASIC AUTH DID NOT HAPPEN.
+    //  THIS IS AWESOME!
+
+    //  CHECKING FOR BASIC AUTH USING THE LOGIN EVENT: 
+    wc.on('login', (event, request, authInfo, callback) => {
+        console.log('Loggin in: ');
+        callback('user', 'passwd');
+    })
+
+    //  WHEN MAIN WINDOW IS LOADING ANY URL, WE CAN EMIT THIS EVENT BEFORE THE MAINWINDOW IS NAVIGATED TO THAT URL: 
+    wc.on('did-navigate', (event, url, statusCode, message) => {
+        console.log(`Navigated to ${ url }, with response code: ${ statusCode }`);
+        console.log(message);
+    });
+
+//  #####################################################################
 }
 
 // ELECTRON APP IS READY:  
