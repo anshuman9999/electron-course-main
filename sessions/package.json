@@ -1,8 +1,8 @@
 {
-  "name": "mainProcessAPI",
+  "name": "sessions",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "sessions.js",
   "scripts": {
     "dev": "nodemon --exec electron ."
   },
