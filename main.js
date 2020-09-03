@@ -63,11 +63,11 @@ const createMainWindow = () => {
     })
 
     //  LOAD FILE IN THE MAIN WINDOW: 
-    //mainWindow.loadFile('./index.html');
+    mainWindow.loadFile('./index.html');
     secondaryWindow.loadFile('./secondary.html');
     thirdWindow.loadFile('./index.html');
 
-    mainWindow.loadURL('https://httpbin.org/basic-auth/user/passwd');
+    // mainWindow.loadURL('https://httpbin.org/basic-auth/user/passwd');
 
     //  SHOWING WINDOW GRACEFULLY:  FIRST METHOD
     // mainWindow.once('ready-to-show', mainWindow.show);
@@ -135,6 +135,17 @@ const createMainWindow = () => {
         console.log(`${ input.key }: ${ input.type }`);
     })
 
+    wc.on('context-menu', (event, params) => {
+        console.log(`Context menu opened on: ${ params.mediaType } at x: ${ params.x }, y: ${ params.y } `)
+        console.log(`User selected text: ${ params.selectionText }`);
+        console.log(`Can selection be copied: ${ params.editFlags.canCopy }`);
+
+        // let selectedText = params.selectionText;
+        // wc.executeJavaScript(`${ selectedText }`)
+        //     .then(response => console.log(response));
+
+    });
+
 // ###################################################
 
     //  CHECKING FOR BASIC AUTH: FIRST THE LOGIN EVENT IS FIRED AT THE TIME OF AUTH
@@ -144,16 +155,16 @@ const createMainWindow = () => {
     //  THIS IS AWESOME!
 
     //  CHECKING FOR BASIC AUTH USING THE LOGIN EVENT: 
-    wc.on('login', (event, request, authInfo, callback) => {
-        console.log('Loggin in: ');
-        callback('user', 'passwd');
-    })
+    // wc.on('login', (event, request, authInfo, callback) => {
+    //     console.log('Loggin in: ');
+    //     callback('user', 'passwd');
+    // })
 
     //  WHEN MAIN WINDOW IS LOADING ANY URL, WE CAN EMIT THIS EVENT BEFORE THE MAINWINDOW IS NAVIGATED TO THAT URL: 
-    wc.on('did-navigate', (event, url, statusCode, message) => {
-        console.log(`Navigated to ${ url }, with response code: ${ statusCode }`);
-        console.log(message);
-    });
+    // wc.on('did-navigate', (event, url, statusCode, message) => {
+    //     console.log(`Navigated to ${ url }, with response code: ${ statusCode }`);
+    //     console.log(message);
+    // });
 
 //  #####################################################################
 }
