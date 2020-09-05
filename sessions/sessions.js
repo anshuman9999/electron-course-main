@@ -137,21 +137,23 @@ const createWindow = () => {
     //     })
     // })
 
-    const optionButtons = [ 'YES', 'NO' ]
+    //  A MESSAGE DIALOG BOX BEFORE QUITTING THE MAINWINDOW: 
 
-    mainWindow.on('close', (e) => {
-        const result = dialog.showMessageBoxSync(mainWindow, {
-            type: 'question',
-            buttons: optionButtons,
-            defaultId: 0,
-            title: 'Quit?',
-            message: 'Sure to quit?',
-            cancelId: 1,
-        });
-        if(result === 1) {
-            e.preventDefault();
-        }
-    })
+    // const optionButtons = [ 'YES', 'NO' ]
+
+    // mainWindow.on('close', (e) => {
+    //     const result = dialog.showMessageBoxSync(mainWindow, {
+    //         type: 'question',
+    //         buttons: optionButtons,
+    //         defaultId: 0,
+    //         title: 'Quit?',
+    //         message: 'Sure to quit?',
+    //         cancelId: 1,
+    //     });
+    //     if(result === 1) {
+    //         e.preventDefault();
+    //     }
+    // })
 
 }
 

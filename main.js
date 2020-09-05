@@ -1,5 +1,6 @@
-const {app, BrowserWindow} = require('electron');
+const { app, BrowserWindow, Menu, Tray } = require('electron');
 const windowStateKeeper = require('electron-window-state');
+const menu = require('./menu');
 
 // setTimeout(() => {
 //     console.log(`Checking if app is ready: ${ app.isReady() }`);
@@ -7,7 +8,39 @@ const windowStateKeeper = require('electron-window-state');
 
 let mainWindow, secondaryWindow, thirdWindow;
 
+let tray;
+
+const createTray = () => {
+    tray = new Tray('./trayTemplate@2x.png')
+    tray.setToolTip('Tray details')
+    //tray.setContextMenu(Menu.buildFromTemplate([{ label: 'file' }]))
+
+    tray.on('click', (e) => {
+
+        if(e.shiftKey) {
+            app.quit();
+        } else {
+            mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
+        }
+
+        //tray.setContextMenu(Menu.buildFromTemplate([{role: 'quit' }]))
+
+    })
+
+    tray.on('right-click', () => {
+        tray.setContextMenu(Menu.buildFromTemplate([ { role: 'quit' } ]))
+    })
+
+}
+
+let contextMenu = Menu.buildFromTemplate([
+    { label: 'action1' },
+    { role: 'editMenu'}
+])
+
 const createMainWindow = () => {
+
+    createTray();
 
     // WINDOW STATE MANAGER:  
     let winState = windowStateKeeper({
@@ -67,6 +100,7 @@ const createMainWindow = () => {
     secondaryWindow.loadFile('./secondary.html');
     thirdWindow.loadFile('./index.html');
 
+
     // mainWindow.loadURL('https://httpbin.org/basic-auth/user/passwd');
 
     //  SHOWING WINDOW GRACEFULLY:  FIRST METHOD
@@ -89,7 +123,7 @@ const createMainWindow = () => {
     })
 
     thirdWindow.on('closed', () => {
-        mainWindow.minimize();
+        thirdWindow = null;
     })
 
     // thirdWindow.on('focus', () => {
@@ -131,22 +165,27 @@ const createMainWindow = () => {
     //     console.log(`Creating a new window for: ${ url }`);
     // })
 
-    wc.on('before-input-event', (event, input) => {
-        console.log(`${ input.key }: ${ input.type }`);
-    })
+
+    //  FOR ANY KEYBOARD INPUT ON THE MAINWINDOW, BEFORE THE INPUT IS ACTUALLY DONE, DO THIS:
+
+    // wc.on('before-input-event', (event, input) => {
+    //     console.log(`${input.key}: ${input.type}`);
+    // })
 
     wc.on('context-menu', (event, params) => {
-        console.log(`Context menu opened on: ${ params.mediaType } at x: ${ params.x }, y: ${ params.y } `)
-        console.log(`User selected text: ${ params.selectionText }`);
-        console.log(`Can selection be copied: ${ params.editFlags.canCopy }`);
+        // console.log(`Context menu opened on: ${params.mediaType} at x: ${params.x}, y: ${params.y} `)
+        // console.log(`User selected text: ${params.selectionText}`);
+        // console.log(`Can selection be copied: ${params.editFlags.canCopy}`);
 
         // let selectedText = params.selectionText;
         // wc.executeJavaScript(`${ selectedText }`)
         //     .then(response => console.log(response));
 
+        contextMenu.popup(mainWindow);
+
     });
 
-// ###################################################
+    // ###################################################
 
     //  CHECKING FOR BASIC AUTH: FIRST THE LOGIN EVENT IS FIRED AT THE TIME OF AUTH
     //  AFTER THAT DID NAVIITE GETS EMITTED WHEN THE LOGIN IS SUCCESSFULL WITH CODE 200\
@@ -166,8 +205,9 @@ const createMainWindow = () => {
     //     console.log(message);
     // });
 
-//  #####################################################################
+    //  #####################################################################
 }
+
 
 // ELECTRON APP IS READY:  
 app.on('ready', () => {
@@ -180,6 +220,9 @@ app.on('ready', () => {
     // console.log(app.getPath('userData'));
 
     createMainWindow();
+
+    const mainMenu = Menu.buildFromTemplate(menu);
+    Menu.setApplicationMenu(mainMenu);
 })
 
 
