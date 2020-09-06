@@ -24,7 +24,6 @@ const createTray = () => {
         }
 
         //tray.setContextMenu(Menu.buildFromTemplate([{role: 'quit' }]))
-
     })
 
     tray.on('right-click', () => {
@@ -120,6 +119,8 @@ const createMainWindow = () => {
     //  WHEN THE MAINWINDOW IS CLOSED: 
     mainWindow.on('closed', () => {
         mainWindow = null;
+        tray = null;
+        app.quit();
     })
 
     thirdWindow.on('closed', () => {
@@ -226,18 +227,15 @@ app.on('ready', () => {
 })
 
 
-
 //  WHEN THE APP IS FOCUSED, THE USER IS IN THE APP:
 // app.on('browser-window-focus', () => {
 //     console.log('App is focused!');
 // })
 
-
 // WHEN THE APP IS UNFOCUSED, THE USER CLICKS OUT OF THE APP OR MINIMIZES IT, ETC: 
 // app.on('browser-window-blur', () => {
 //     console.log('App is unfocused!');
 // })
-
 
 // app.on('before-quit', (event) => {
 //     console.log('Preventing the app from quitting: ');
